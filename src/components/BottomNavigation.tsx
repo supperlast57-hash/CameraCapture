@@ -38,7 +38,16 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = ({
             activeOpacity={0.7}
           >
             <View style={styles.cameraIconWrapper}>
-              <Ionicons name="camera-outline" size={26} color="#FFFFFF" />
+              <View style={[
+                styles.cameraIconBackground,
+                currentRoute === 'camera' && styles.cameraIconBackgroundActive
+              ]}>
+                <Ionicons
+                  name="camera-outline"
+                  size={26}
+                  color={currentRoute === 'camera' ? "#007AFF" : "#FFFFFF"}
+                />
+              </View>
             </View>
           </TouchableOpacity>
           {currentRoute === 'camera' && <View style={styles.cameraIndicator} />}
@@ -105,5 +114,16 @@ const styles = StyleSheet.create({
     height: 2,
     backgroundColor: '#FFFFFF',
     borderRadius: 1,
+  },
+  cameraIconBackground: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  cameraIconBackgroundActive: {
+    backgroundColor: 'rgba(0, 122, 255, 0.2)',
   },
 });
