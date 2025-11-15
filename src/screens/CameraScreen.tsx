@@ -1,4 +1,4 @@
-// src/screens/CameraScreen.tsx (SDK 50 Compatible)
+// src/screens/CameraScreen.tsx
 import React, { useState, useRef, useEffect } from 'react';
 import { View, TouchableOpacity, StyleSheet, Text, Alert } from 'react-native';
 import { Camera, CameraType } from 'expo-camera';
@@ -7,6 +7,8 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types';
 import { logger } from '../services/logging';
 import { COLORS } from '../utils/constants';
+import { BottomNavigation } from '../components/BottomNavigation';
+import { Ionicons } from '@expo/vector-icons';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'Camera'>;
 
@@ -82,14 +84,37 @@ export default function CameraScreen() {
     }
   };
 
+  const handleGalleryPress = () => {
+    Alert.alert('Gallery', 'Gallery picker coming soon!\n\nInstall expo-image-picker to enable this feature.');
+  };
+
+  const handleMicPress = () => {
+    Alert.alert('Voice Input', 'Voice input coming soon!\n\nInstall expo-av to enable voice recording.');
+  };
+
+  const handleNavigation = (route: 'search' | 'camera' | 'profile') => {
+    if (route === 'search') {
+      navigation.navigate('Search');
+    } else if (route === 'profile') {
+      navigation.navigate('Profile');
+    }
+  };
+
   return (
     <View style={styles.container}>
-      <Camera 
+      <Camera
         ref={cameraRef}
         style={styles.camera}
         type={CameraType.back}
       >
         <View style={styles.overlay}>
+          {/* Gradient overlay at bottom */}
+          <View style={styles.gradientOverlay}>
+            <View style={styles.gradientTop} />
+            <View style={styles.gradientMiddle} />
+            <View style={styles.gradientBottom} />
+          </View>
+
           <View style={styles.topBar}>
             <View style={styles.brandContainer}>
               <Text style={styles.brandEmoji}>🎁</Text>
@@ -101,13 +126,51 @@ export default function CameraScreen() {
             <Text style={styles.instructionText}>Take a pic and get{'\n'}an answer</Text>
           </View>
 
-          <View style={styles.bottomBar}>
-            <TouchableOpacity style={styles.captureButton} onPress={takePicture}>
-              <View style={styles.captureButtonInner} />
+          <View style={styles.bottomSpacer} />
+
+          {/* Bottom Controls with Gallery, Capture, and Mic */}
+          <View style={styles.captureContainer}>
+            {/* Gallery Icon Button */}
+            <TouchableOpacity
+              style={styles.iconButton}
+              onPress={handleGalleryPress}
+              activeOpacity={0.7}
+            >
+              <View style={styles.iconButtonInner}>
+                <Ionicons name="images-outline" size={28} color="#FFFFFF" />
+              </View>
+            </TouchableOpacity>
+
+            {/* Circular Capture Button */}
+            <TouchableOpacity
+              onPress={takePicture}
+              activeOpacity={0.7}
+            >
+              <View style={styles.outerRing}>
+                <View style={styles.middleRing}>
+                  <View style={styles.innerCircle} />
+                </View>
+              </View>
+            </TouchableOpacity>
+
+            {/* Microphone Icon Button */}
+            <TouchableOpacity
+              style={styles.iconButton}
+              onPress={handleMicPress}
+              activeOpacity={0.7}
+            >
+              <View style={styles.iconButtonInner}>
+                <Ionicons name="mic-outline" size={28} color="#FFFFFF" />
+              </View>
             </TouchableOpacity>
           </View>
         </View>
       </Camera>
+      
+      <BottomNavigation
+        currentRoute="camera"
+        onNavigate={handleNavigation}
+      />
     </View>
   );
 }
@@ -116,7 +179,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.background,
-    justifyContent: 'center',
   },
   message: {
     textAlign: 'center',
@@ -144,11 +206,44 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'transparent',
   },
+  gradientOverlay: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 400,
+    backgroundColor: 'transparent',
+  },
+  gradientTop: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 150,
+    backgroundColor: 'rgba(0, 0, 0, 0)',
+  },
+  gradientMiddle: {
+    position: 'absolute',
+    top: 150,
+    left: 0,
+    right: 0,
+    height: 100,
+    backgroundColor: 'rgba(10, 6, 6, 0.49)',
+  },
+  gradientBottom: {
+    position: 'absolute',
+    top: 170,
+    left: 0,
+    right: 0,
+    bottom: 10,
+    backgroundColor: '#8a1616ff',
+  },
   topBar: {
     paddingTop: 50,
     paddingHorizontal: 20,
     flexDirection: 'row',
     justifyContent: 'center',
+    zIndex: 10,
   },
   brandContainer: {
     flexDirection: 'row',
@@ -177,23 +272,61 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: '700',
     textAlign: 'center',
+    zIndex: 10,
   },
-  bottomBar: {
-    paddingBottom: 50,
-    alignItems: 'center',
-  },
-  captureButton: {
-    width: 80,
+  bottomSpacer: {
     height: 80,
-    borderRadius: 40,
-    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+  },
+  captureContainer: {
+    position: 'absolute',
+    bottom: 100,
+    left: 0,
+    right: 0,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 40,
+    zIndex: 10,
+  },
+  iconButton: {
+    width: 62.5,  // Increased by 25% (50 * 1.25 = 62.5)
+    height: 62.5, // Increased by 25% (50 * 1.25 = 62.5)
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginHorizontal: 30,
+  },
+  iconButtonInner: {
+    width: 62.5,  // Increased by 25% (50 * 1.25 = 62.5)
+    height: 62.5, // Increased by 25% (50 * 1.25 = 62.5)
+    borderRadius: 31.25, // Adjusted for new size (62.5 / 2)
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  captureButtonInner: {
+  outerRing: {
+    width: 90,
+    height: 90,
+    borderRadius: 45,
+    backgroundColor: 'transparent',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 6,
+    borderColor: 'transparent',
+  },
+  middleRing: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: 'transparent',
+    borderWidth: 2,
+    borderColor: 'white',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  innerCircle: {
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: COLORS.white,
+    backgroundColor: '#5FA8A8',
   },
 });

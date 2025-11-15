@@ -1,5 +1,4 @@
-// FILE: src/screens/CropScreen.tsx (UPDATED - Initialize Centered)
-// ============================================
+// src/screens/CropScreen.tsx
 import React, { useState, useEffect } from 'react';
 import { 
   View, 
@@ -20,6 +19,7 @@ import { cropDetectionService } from '../services/cropDetection';
 import { imageProcessor } from '../services/imageProcessor';
 import { logger } from '../services/logging';
 import { COLORS } from '../utils/constants';
+import { Ionicons } from '@expo/vector-icons';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'Crop'>;
 type RoutePropType = RouteProp<RootStackParamList, 'Crop'>;
@@ -36,7 +36,6 @@ export default function CropScreen() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [displayDimensions, setDisplayDimensions] = useState({ width: 0, height: 0 });
   
-  // Initialize crop region centered in the image
   const [cropRegion, setCropRegion] = useState<CropRegion>({
     x: dimensions.width * 0.1,
     y: dimensions.height * 0.25,
@@ -47,7 +46,6 @@ export default function CropScreen() {
   useEffect(() => {
     logger.navigationToScreen('CropScreen');
     
-    // Calculate display dimensions maintaining aspect ratio
     const aspectRatio = dimensions.width / dimensions.height;
     let displayWidth = SCREEN_WIDTH;
     let displayHeight = SCREEN_WIDTH / aspectRatio;
@@ -59,7 +57,6 @@ export default function CropScreen() {
 
     setDisplayDimensions({ width: displayWidth, height: displayHeight });
 
-    // Auto-detect if enabled
     if (autoMode) {
       detectQuestion();
     }
@@ -93,7 +90,6 @@ export default function CropScreen() {
 
     try {
       const croppedUri = await imageProcessor.cropImage(photoUri, cropRegion, dimensions);
-      
       navigation.navigate('Preview', { croppedUri });
     } catch (error) {
       logger.cameraError(error as Error, 'cropImage');
@@ -103,13 +99,33 @@ export default function CropScreen() {
     }
   };
 
+  const handleGalleryPress = () => {
+    Alert.alert('Gallery', 'Gallery picker coming soon!');
+  };
+
+  const handleMicPress = () => {
+    Alert.alert('Voice Input', 'Voice input coming soon!');
+  };
+
   return (
     <View style={styles.container}>
+      {/* Gradient overlay for top section */}
+      <View style={styles.topGradientOverlay}>
+        <View style={styles.topGradientTop} />
+        <View style={styles.topGradientBottom} />
+      </View>
+
       <View style={styles.topBar}>
+        <TouchableOpacity style={styles.backButton} onPress={handleRetake}>
+          <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
+        </TouchableOpacity>
         <View style={styles.brandContainer}>
           <Text style={styles.brandEmoji}>🎁</Text>
           <Text style={styles.brandText}>Get pro</Text>
         </View>
+        <TouchableOpacity style={styles.helpButton}>
+          <Ionicons name="help-circle-outline" size={24} color="#FFFFFF" />
+        </TouchableOpacity>
       </View>
 
       <View style={styles.imageContainer}>
@@ -128,32 +144,60 @@ export default function CropScreen() {
         )}
       </View>
 
-      <View style={styles.controls}>
-        <ToggleButton 
-          autoMode={autoMode} 
-          onToggle={handleToggleMode}
-        />
+      {/* Bottom gradient and controls */}
+      <View style={styles.bottomSection}>
+        <View style={styles.gradientOverlay}>
+          <View style={styles.gradientTop} />
+          <View style={styles.gradientMiddle} />
+          <View style={styles.gradientBottom} />
+        </View>
 
-        <View style={styles.actionButtons}>
-          <TouchableOpacity 
-            style={styles.actionButton} 
-            onPress={handleRetake}
-            disabled={isProcessing}
-          >
-            <Text style={styles.actionButtonText}>Retake</Text>
-          </TouchableOpacity>
+        <View style={styles.controlsWrapper}>
+          <ToggleButton 
+            autoMode={autoMode} 
+            onToggle={handleToggleMode}
+          />
 
-          <TouchableOpacity 
-            style={[styles.actionButton, styles.confirmButton]} 
-            onPress={handleConfirm}
-            disabled={isProcessing}
-          >
-            {isProcessing ? (
-              <ActivityIndicator color={COLORS.white} />
-            ) : (
-              <Text style={styles.confirmButtonText}>Confirm</Text>
-            )}
-          </TouchableOpacity>
+          {/* Action buttons with icons */}
+          <View style={styles.captureContainer}>
+            <TouchableOpacity
+              style={styles.iconButton}
+              onPress={handleGalleryPress}
+              activeOpacity={0.7}
+            >
+              <View style={styles.iconButtonInner}>
+                <Ionicons name="images-outline" size={28} color="#FFFFFF" />
+              </View>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={handleConfirm}
+              activeOpacity={0.7}
+              disabled={isProcessing}
+            >
+              <View style={styles.outerRing}>
+                <View style={styles.middleRing}>
+                  {isProcessing ? (
+                    <ActivityIndicator color="#FFFFFF" size="large" />
+                  ) : (
+                    <View style={styles.innerCircle}>
+                      <Ionicons name="checkmark" size={32} color="#FFFFFF" />
+                    </View>
+                  )}
+                </View>
+              </View>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.iconButton}
+              onPress={handleMicPress}
+              activeOpacity={0.7}
+            >
+              <View style={styles.iconButtonInner}>
+                <Ionicons name="mic-outline" size={28} color="#FFFFFF" />
+              </View>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     </View>
@@ -165,17 +209,55 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.background,
   },
+  topGradientOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 150,
+    zIndex: 1,
+  },
+  topGradientTop: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 100,
+    backgroundColor: '#000000',
+  },
+  topGradientBottom: {
+    position: 'absolute',
+    top: 100,
+    left: 0,
+    right: 0,
+    height: 50,
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+  },
   topBar: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
     paddingTop: 50,
     paddingHorizontal: 20,
     paddingBottom: 20,
     flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    zIndex: 10,
+  },
+  backButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
     justifyContent: 'center',
+    alignItems: 'center',
   },
   brandContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
@@ -189,42 +271,116 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
+  helpButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   imageContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    paddingTop: 120,
+    paddingBottom: 300,
   },
   image: {
     backgroundColor: '#1a1a1a',
   },
-  controls: {
-    paddingHorizontal: 20,
-    paddingBottom: 40,
+  bottomSection: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 300,
   },
-  actionButtons: {
+  gradientOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 0,
+  },
+  gradientTop: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 80,
+    backgroundColor: 'rgba(0, 0, 0, 0)',
+  },
+  gradientMiddle: {
+    position: 'absolute',
+    top: 80,
+    left: 0,
+    right: 0,
+    height: 70,
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+  },
+  gradientBottom: {
+    position: 'absolute',
+    top: 150,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: '#000000',
+  },
+  controlsWrapper: {
+    position: 'relative',
+    zIndex: 1,
+    paddingTop: 20,
+  },
+  captureContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 40,
+    marginTop: 30,
   },
-  actionButton: {
-    flex: 1,
-    paddingVertical: 16,
-    borderRadius: 12,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    marginHorizontal: 8,
+  iconButton: {
+    width: 50,
+    height: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginHorizontal: 30,
+  },
+  iconButtonInner: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: '#333',
+    justifyContent: 'center',
     alignItems: 'center',
   },
-  actionButtonText: {
-    color: COLORS.white,
-    fontSize: 16,
-    fontWeight: '600',
+  outerRing: {
+    width: 90,
+    height: 90,
+    borderRadius: 45,
+    backgroundColor: 'transparent',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 6,
+    borderColor: 'transparent',
   },
-  confirmButton: {
-    backgroundColor: COLORS.primary,
+  middleRing: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: 'transparent',
+    borderWidth: 2,
+    borderColor: 'white',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  confirmButtonText: {
-    color: COLORS.white,
-    fontSize: 16,
-    fontWeight: '600',
+  innerCircle: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: '#5FA8A8',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
