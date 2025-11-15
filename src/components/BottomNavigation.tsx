@@ -17,68 +17,104 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = ({
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.content}>
-        <TouchableOpacity
-          style={styles.navItem}
-          onPress={() => onNavigate('search')}
-          activeOpacity={0.7}
-        >
-          <Ionicons
-            name="search-outline"
-            size={24}
-            color={getIconColor('search')}
-          />
-        </TouchableOpacity>
-
-        <View style={styles.cameraContainer}>
+    <View style={styles.wrapper}>
+      {/* Gradient overlay */}
+      <View style={styles.gradientOverlay}>
+        <View style={styles.gradientTop} />
+        <View style={styles.gradientBottom} />
+      </View>
+      
+      <View style={styles.container}>
+        <View style={styles.content}>
           <TouchableOpacity
-            style={styles.cameraButton}
-            onPress={() => onNavigate('camera')}
+            style={styles.navItem}
+            onPress={() => onNavigate('search')}
             activeOpacity={0.7}
           >
-            <View style={styles.cameraIconWrapper}>
-              <View style={[
-                styles.cameraIconBackground,
-                currentRoute === 'camera' && styles.cameraIconBackgroundActive
-              ]}>
-                <Ionicons
-                  name="camera-outline"
-                  size={26}
-                  color={currentRoute === 'camera' ? "#007AFF" : "#FFFFFF"}
-                />
-              </View>
-            </View>
+            <Ionicons
+              name="search-outline"
+              size={24}
+              color={getIconColor('search')}
+            />
           </TouchableOpacity>
-          {currentRoute === 'camera' && <View style={styles.cameraIndicator} />}
-        </View>
 
-        <TouchableOpacity
-          style={styles.navItem}
-          onPress={() => onNavigate('profile')}
-          activeOpacity={0.7}
-        >
-          <Ionicons
-            name="person-outline"
-            size={24}
-            color={getIconColor('profile')}
-          />
-        </TouchableOpacity>
+          <View style={styles.cameraContainer}>
+            <TouchableOpacity
+              style={styles.cameraButton}
+              onPress={() => onNavigate('camera')}
+              activeOpacity={0.7}
+            >
+              <View style={styles.cameraIconWrapper}>
+                <View style={[
+                  styles.cameraIconBackground,
+                  currentRoute === 'camera' && styles.cameraIconBackgroundActive
+                ]}>
+                  <Ionicons
+                    name="camera-outline"
+                    size={26}
+                    color={currentRoute === 'camera' ? "#007AFF" : "#FFFFFF"}
+                  />
+                </View>
+              </View>
+            </TouchableOpacity>
+            {currentRoute === 'camera' && <View style={styles.cameraIndicator} />}
+          </View>
+
+          <TouchableOpacity
+            style={styles.navItem}
+            onPress={() => onNavigate('profile')}
+            activeOpacity={0.7}
+          >
+            <Ionicons
+              name="person-outline"
+              size={24}
+              color={getIconColor('profile')}
+            />
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  wrapper: {
     position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
+  },
+  gradientOverlay: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 150,
+    zIndex: 0,
+  },
+  gradientTop: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 50,
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+  },
+  gradientBottom: {
+    position: 'absolute',
+    top: 50,
+    left: 0,
+    right: 0,
+    bottom: 0,
     backgroundColor: '#000000',
+  },
+  container: {
+    position: 'relative',
+    backgroundColor: 'black',
     borderTopWidth: 0.5,
     borderTopColor: 'rgba(255, 255, 255, 0.1)',
     paddingBottom: Platform.OS === 'ios' ? 20 : 10,
+    zIndex: 1,
   },
   content: {
     flexDirection: 'row',

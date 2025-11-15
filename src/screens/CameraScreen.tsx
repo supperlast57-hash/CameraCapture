@@ -108,6 +108,13 @@ export default function CameraScreen() {
         type={CameraType.back}
       >
         <View style={styles.overlay}>
+          {/* Gradient overlay at bottom */}
+          <View style={styles.gradientOverlay}>
+            <View style={styles.gradientTop} />
+            <View style={styles.gradientMiddle} />
+            <View style={styles.gradientBottom} />
+          </View>
+
           <View style={styles.topBar}>
             <View style={styles.brandContainer}>
               <Text style={styles.brandEmoji}>🎁</Text>
@@ -199,11 +206,44 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'transparent',
   },
+  gradientOverlay: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 400,
+    backgroundColor: 'transparent',
+  },
+  gradientTop: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 150,
+    backgroundColor: 'rgba(0, 0, 0, 0)',
+  },
+  gradientMiddle: {
+    position: 'absolute',
+    top: 150,
+    left: 0,
+    right: 0,
+    height: 100,
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+  },
+  gradientBottom: {
+    position: 'absolute',
+    top: 250,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: '#000000',
+  },
   topBar: {
     paddingTop: 50,
     paddingHorizontal: 20,
     flexDirection: 'row',
     justifyContent: 'center',
+    zIndex: 10,
   },
   brandContainer: {
     flexDirection: 'row',
@@ -232,6 +272,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: '700',
     textAlign: 'center',
+    zIndex: 10,
   },
   bottomSpacer: {
     height: 80,
@@ -245,6 +286,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 40,
+    zIndex: 10,
   },
   iconButton: {
     width: 50,
@@ -257,7 +299,7 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 25,
-    backgroundColor: '#333',
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
     justifyContent: 'center',
     alignItems: 'center',
   },
